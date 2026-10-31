@@ -122,6 +122,17 @@
   .foot { position: relative; z-index: 1; margin-top: 14px; font-size: .72rem; color: var(--muted); text-align: center; }
   .foot b { color: var(--text); }
   .wrap { width: 100%; max-width: 400px; }
+  .consent { display: flex; gap: 10px; align-items: flex-start; text-align: left; font-size: .84rem; color: var(--muted);
+    margin: 4px 2px 14px; cursor: pointer; line-height: 1.45; }
+  .consent input { width: 18px; height: 18px; margin: 1px 0 0; flex: none; accent-color: var(--brand); padding: 0; }
+  .err { color: #dc2626; font-size: .85rem; font-weight: 600; min-height: 0; margin: -4px 0 10px; }
+  .err:empty { display: none; }
+  input.bad { border-color: #dc2626; }
+  .privacy { font-size: .75rem; color: var(--muted); margin-top: 14px; }
+  .loader { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; margin: 0 20px; }
+  .loader span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--brand), var(--brand-2));
+    animation: load 1.4s ease forwards; }
+  @keyframes load { to { width: 100%; } }
   canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 </style>
 </head>
@@ -135,8 +146,33 @@
   <div class="avatar" id="avatar"></div>
   <div class="body">
 
+    <!-- LITE: terus ke Google -->
+    <section class="step" id="s-lite">
+      <div class="eyebrow lite-name"></div>
+      <h1>Terima kasih kerana singgah! 💛</h1>
+      <p>Membuka Google Review…</p>
+      <div class="loader"><span></span></div>
+      <a class="btn google" id="liteGo" style="margin-top:18px;text-decoration:none">
+        <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+        Tulis ulasan di Google
+      </a>
+    </section>
+
+    <!-- SMART STEP 0: nama & telefon -->
+    <section class="step" id="s-info">
+      <div class="eyebrow lite-name"></div>
+      <h1>Hai! Kenalkan diri sikit 👋</h1>
+      <p>Supaya kami boleh hubungi anda jika perlu &amp; beri tawaran istimewa.</p>
+      <div class="field"><input id="cname" autocomplete="name" placeholder="Nama anda"></div>
+      <div class="field"><input id="cphone" inputmode="tel" autocomplete="tel" placeholder="No. telefon (cth: 012-3456789)"></div>
+      <label class="consent"><input type="checkbox" id="optin"> <span>Saya setuju terima promosi &amp; tawaran daripada <b class="lite-name"></b> melalui WhatsApp/SMS.</span></label>
+      <div class="err" id="infoErr"></div>
+      <button class="btn" id="infoNext">Teruskan →</button>
+      <div class="privacy">🔒 Maklumat anda hanya untuk kegunaan kedai ini &amp; tidak dikongsi dengan pihak lain.</div>
+    </section>
+
     <!-- STEP 1: pilih bintang -->
-    <section class="step active" id="s-rate">
+    <section class="step" id="s-rate">
       <div class="eyebrow" id="shopName">Kedai Anda</div>
       <h1>Macam mana pengalaman anda hari ini?</h1>
       <div class="face" id="face">😊</div>
@@ -151,7 +187,6 @@
       <p>Apa yang tak kena? Pemilik kedai akan baca sendiri &amp; tindak segera.</p>
       <div class="chips" id="chips"></div>
       <div class="field"><textarea id="msg" placeholder="Ceritakan sedikit pengalaman anda…"></textarea></div>
-      <div class="field"><input id="contact" inputmode="tel" placeholder="No. telefon (pilihan)"></div>
       <button class="btn" id="send">Hantar maklum balas</button>
       <a class="link" id="googleAnyway" target="_blank" rel="noopener">Atau tulis ulasan di Google</a>
     </section>
@@ -188,6 +223,7 @@
    ?shop=Nama&place=PLACE_ID&wa=60123456789&color=%23e11d48&logo=URL
    ========================================================= */
 const CONFIG = {
+  plan: "smart",                    // "lite" = terus ke Google | "smart" = data pelanggan + tapisan dalaman
   shopName: "Kopi Pak Mat",
   logo: "",                         // URL logo (kosongkan → huruf pertama nama kedai)
   brandColor: "#6d28d9",            // warna utama jenama
@@ -203,6 +239,7 @@ const CONFIG = {
 
 // Override dari URL — 1 fail boleh guna untuk banyak kedai
 const q = new URLSearchParams(location.search);
+if (q.get("plan"))   CONFIG.plan = q.get("plan") === "lite" ? "lite" : "smart";
 if (q.get("shop"))   CONFIG.shopName = q.get("shop");
 if (q.get("place"))  CONFIG.googlePlaceId = q.get("place");
 if (q.get("wa"))     CONFIG.whatsapp = q.get("wa");
@@ -230,6 +267,46 @@ if (CONFIG.logo) {
 }
 $("googleAnyway").href = GOOGLE_URL;
 if (!CONFIG.showGoogleOnLowRating) $("googleAnyway").style.display = "none";
+document.querySelectorAll(".lite-name").forEach(e => e.textContent = CONFIG.shopName);
+
+// Maklumat pelanggan (Smart)
+const customer = { name: "", phone: "", optin: false };
+const STORE_KEY = "binareview:" + CONFIG.shopName;
+
+if (CONFIG.plan === "lite") {
+  // LITE: skrin jenama sekejap → terus ke Google
+  $("liteGo").href = GOOGLE_URL;
+  show("s-lite");
+  log({ type: "lite_tap" });
+  setTimeout(() => location.href = GOOGLE_URL, 1400);
+} else {
+  // SMART: isi nama & telefon dulu (diingat untuk lawatan seterusnya)
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+    if (saved) { $("cname").value = saved.name || ""; $("cphone").value = saved.phone || ""; }
+  } catch {}
+  show("s-info");
+}
+
+function normPhone(v) {
+  let d = v.replace(/\D/g, "");
+  if (d.startsWith("0")) d = "6" + d;           // 012… → 6012…
+  return /^601\d{8,9}$/.test(d) ? d : "";       // nombor mudah alih Malaysia
+}
+$("infoNext").onclick = () => {
+  const name = $("cname").value.trim(), phone = normPhone($("cphone").value);
+  $("cname").classList.toggle("bad", !name);
+  $("cphone").classList.toggle("bad", !phone);
+  if (!name)  { $("infoErr").textContent = "Sila isi nama anda."; $("cname").focus(); return; }
+  if (!phone) { $("infoErr").textContent = "No. telefon tidak sah (cth: 012-3456789)."; $("cphone").focus(); return; }
+  $("infoErr").textContent = "";
+  Object.assign(customer, { name, phone, optin: $("optin").checked });
+  try { localStorage.setItem(STORE_KEY, JSON.stringify({ name, phone: $("cphone").value.trim() })); } catch {}
+  log({ type: "checkin" });
+  show("s-rate");
+};
+["cname","cphone"].forEach(id => $(id).addEventListener("input", () => { $(id).classList.remove("bad"); $("infoErr").textContent = ""; }));
+$("cphone").addEventListener("keydown", e => { if (e.key === "Enter") $("infoNext").click(); });
 
 // Bintang
 const STAR = '<svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z" stroke-linejoin="round"/></svg>';
@@ -283,7 +360,7 @@ CONFIG.issues.forEach(t => {
 
 // Hantar maklum balas dalaman
 $("send").onclick = () => {
-  const msg = $("msg").value.trim(), contact = $("contact").value.trim();
+  const msg = $("msg").value.trim(), contact = customer.phone;
   if (!msg && !picked.size) {
     const b = $("send"); b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake");
     $("msg").focus(); return;
@@ -291,7 +368,7 @@ $("send").onclick = () => {
   const data = { type: "feedback", rating, issues: [...picked].join(", "), message: msg, contact };
   log(data);
   if (CONFIG.whatsapp && !CONFIG.sheetWebhook) {
-    const text = `⭐ Maklum balas ${CONFIG.shopName} (${rating}/5)\nIsu: ${data.issues || "-"}\n${msg}\nHubungi: ${contact || "-"}`;
+    const text = `⭐ Maklum balas ${CONFIG.shopName} (${rating}/5)\nNama: ${customer.name}\nTel: +${contact}\nIsu: ${data.issues || "-"}\n${msg}`;
     window.open("https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(text), "_blank");
   }
   show("s-done");
@@ -308,7 +385,8 @@ $("copyGo").onclick = async () => {
 // Hantar ke Google Sheet (jika ada webhook)
 function log(data) {
   if (!CONFIG.sheetWebhook) return;
-  const body = JSON.stringify({ ...data, shop: CONFIG.shopName, ua: navigator.userAgent, ts: new Date().toISOString() });
+  const body = JSON.stringify({ plan: CONFIG.plan, name: customer.name, phone: customer.phone,
+    optin: customer.optin ? "Ya" : "Tidak", ...data, shop: CONFIG.shopName, ua: navigator.userAgent, ts: new Date().toISOString() });
   try { navigator.sendBeacon(CONFIG.sheetWebhook, body); } catch {}
 }
 
