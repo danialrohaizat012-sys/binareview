@@ -4,157 +4,273 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Nilai Kami</title>
-<meta name="theme-color" content="#0f172a">
+<meta name="theme-color" content="#1e1b4b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f8fafc;
-    --card: #ffffff;
-    --text: #0f172a;
-    --muted: #64748b;
-    --line: #e2e8f0;
-    --accent: #f59e0b;
-    --brand: #0f172a;
-    --ok: #16a34a;
-    --radius: 18px;
+    --brand: #6d28d9;          /* ditukar oleh CONFIG.brandColor / ?color= */
+    --brand-2: #db2777;
+    --bg: #f5f3ff;
+    --card: rgba(255,255,255,.86);
+    --solid: #ffffff;
+    --text: #1e1b4b;
+    --muted: #6b7280;
+    --line: rgba(30,27,75,.10);
+    --star-off: #e5e7eb;
+    --star-on: #fbbf24;
+    --shadow: 0 24px 60px -20px rgba(49,46,129,.35), 0 2px 6px rgba(0,0,0,.04);
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg:#0b1120; --card:#111827; --text:#f1f5f9; --muted:#94a3b8; --line:#1f2937; --brand:#f1f5f9; }
+    :root { --bg:#0c0a1d; --card:rgba(24,22,48,.82); --solid:#181630; --text:#f5f3ff; --muted:#a5a3c2;
+      --line:rgba(255,255,255,.10); --star-off:#34314f; --shadow:0 24px 60px -20px rgba(0,0,0,.7); }
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; background: var(--bg); color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  body { min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: 20px 16px; }
-  .card { width: 100%; max-width: 420px; background: var(--card); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 28px 22px; box-shadow: 0 10px 30px rgba(0,0,0,.06); text-align: center; }
-  .logo { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px; display: block;
-    background: var(--line); }
-  h1 { font-size: 1.35rem; margin: 0 0 6px; }
-  p { color: var(--muted); margin: 0 0 18px; line-height: 1.5; }
-  .stars { display: flex; justify-content: center; gap: 6px; margin: 8px 0 6px; }
-  .star { background: none; border: 0; padding: 4px; cursor: pointer; font-size: 2.6rem; line-height: 1;
-    color: var(--line); transition: transform .12s, color .12s; }
-  .star.on { color: var(--accent); }
-  .star:active { transform: scale(.88); }
-  .hint { font-size: .85rem; color: var(--muted); min-height: 1.2em; margin-bottom: 4px; }
-  .step { display: none; animation: fade .25s ease; }
-  .step.active { display: block; }
-  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  textarea, input { width: 100%; border: 1px solid var(--line); background: var(--bg); color: var(--text);
-    border-radius: 12px; padding: 12px; font: inherit; margin-bottom: 10px; }
-  textarea { min-height: 110px; resize: vertical; }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 12px; }
-  .chip { border: 1px solid var(--line); background: var(--bg); color: var(--text); border-radius: 999px;
-    padding: 8px 12px; font-size: .9rem; cursor: pointer; }
-  .chip.on { background: var(--brand); color: var(--card); border-color: var(--brand); }
-  .btn { display: block; width: 100%; border: 0; border-radius: 12px; padding: 14px; font: inherit; font-weight: 600;
-    background: var(--brand); color: var(--card); cursor: pointer; text-decoration: none; margin-top: 4px; }
-  .btn:disabled { opacity: .5; }
-  .link { display: inline-block; margin-top: 14px; color: var(--muted); font-size: .85rem; }
-  .big { font-size: 3rem; margin-bottom: 6px; }
-  .foot { margin-top: 18px; font-size: .75rem; color: var(--muted); }
+  html, body { margin: 0; }
+  body {
+    min-height: 100dvh; display: flex; align-items: center; justify-content: center;
+    padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+    background: var(--bg); color: var(--text);
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+  /* Latar belakang bergerak */
+  .blob { position: fixed; border-radius: 50%; filter: blur(70px); opacity: .45; z-index: 0; pointer-events: none;
+    animation: float 14s ease-in-out infinite alternate; }
+  .b1 { width: 320px; height: 320px; background: var(--brand); top: -90px; left: -90px; }
+  .b2 { width: 280px; height: 280px; background: var(--brand-2); bottom: -80px; right: -80px; animation-delay: -6s; }
+  @keyframes float { to { transform: translate(40px, 30px) scale(1.12); } }
+
+  .card {
+    position: relative; z-index: 1; width: 100%; max-width: 400px;
+    background: var(--card); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--line); border-radius: 28px; box-shadow: var(--shadow);
+    overflow: hidden; text-align: center;
+  }
+  .hero { height: 96px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); position: relative; }
+  .hero::after { content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 20% 30%, rgba(255,255,255,.35), transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(255,255,255,.2), transparent 35%); }
+  .avatar { width: 84px; height: 84px; border-radius: 50%; margin: -46px auto 10px; position: relative; z-index: 2;
+    background: var(--solid); border: 4px solid var(--solid); box-shadow: 0 8px 24px rgba(0,0,0,.15);
+    display: grid; place-items: center; overflow: hidden;
+    font-weight: 800; font-size: 1.9rem; color: var(--brand); }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .body { padding: 0 24px 26px; }
+  .eyebrow { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  h1 { font-size: 1.45rem; font-weight: 800; margin: 4px 0 6px; letter-spacing: -.02em; line-height: 1.25; }
+  p { color: var(--muted); margin: 0 0 18px; line-height: 1.55; font-size: .95rem; }
+
+  .step { display: none; }
+  .step.active { display: block; animation: in .45s cubic-bezier(.2,.8,.2,1); }
+  @keyframes in { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+
+  /* Muka emoji yang berubah ikut bintang */
+  .face { font-size: 3.4rem; height: 64px; line-height: 64px; margin: 6px 0 2px; transition: transform .3s; }
+  .face.pop { animation: pop .35s ease; }
+  @keyframes pop { 50% { transform: scale(1.25) rotate(-6deg); } }
+
+  .stars { display: flex; justify-content: center; gap: 4px; margin: 6px 0 8px; }
+  .star { background: none; border: 0; padding: 4px; cursor: pointer; width: 54px; height: 54px; }
+  .star svg { width: 100%; height: 100%; display: block; transition: transform .2s cubic-bezier(.3,1.6,.5,1), filter .2s; }
+  .star path { fill: var(--star-off); transition: fill .2s; }
+  .star.on path { fill: var(--star-on); }
+  .star.on svg { filter: drop-shadow(0 4px 10px rgba(251,191,36,.55)); }
+  .star:hover svg { transform: scale(1.15); }
+  .star:active svg { transform: scale(.85); }
+  .star.bounce svg { animation: bounce .45s ease; }
+  @keyframes bounce { 40% { transform: scale(1.35) rotate(12deg); } }
+  .hint { font-weight: 700; font-size: .95rem; min-height: 1.4em; color: var(--text); }
+  .hint.muted { color: var(--muted); font-weight: 500; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 0 0 14px; }
+  .chip { border: 1.5px solid var(--line); background: var(--solid); color: var(--text); border-radius: 999px;
+    padding: 9px 14px; font: inherit; font-size: .86rem; font-weight: 600; cursor: pointer; transition: all .18s; }
+  .chip.on { background: var(--brand); border-color: var(--brand); color: #fff; transform: translateY(-1px);
+    box-shadow: 0 6px 16px -6px var(--brand); }
+
+  .field { position: relative; margin-bottom: 10px; }
+  textarea, input { width: 100%; border: 1.5px solid var(--line); background: var(--solid); color: var(--text);
+    border-radius: 16px; padding: 14px 16px; font: inherit; font-size: .95rem; outline: none; transition: border .2s, box-shadow .2s; }
+  textarea { min-height: 104px; resize: none; }
+  textarea:focus, input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 18%, transparent); }
+
+  .btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; border: 0;
+    border-radius: 16px; padding: 16px; font: inherit; font-weight: 700; font-size: 1rem; cursor: pointer;
+    color: #fff; background: linear-gradient(135deg, var(--brand), var(--brand-2));
+    box-shadow: 0 12px 24px -10px var(--brand); transition: transform .15s, box-shadow .15s; }
+  .btn:active { transform: scale(.98); }
+  .btn.google { background: var(--solid); color: var(--text); border: 1.5px solid var(--line);
+    box-shadow: 0 10px 24px -12px rgba(0,0,0,.25); }
+  .btn.google svg { width: 22px; height: 22px; }
+  .btn.shake { animation: shake .4s; }
+  @keyframes shake { 25%,75% { transform: translateX(-6px); } 50% { transform: translateX(6px); } }
+
+  .link { display: inline-block; margin-top: 16px; color: var(--muted); font-size: .84rem; text-decoration: none;
+    border-bottom: 1px dashed currentColor; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px;
+    background: color-mix(in srgb, var(--star-on) 18%, transparent); color: #b45309; font-weight: 700; font-size: .82rem; margin-bottom: 10px; }
+  @media (prefers-color-scheme: dark) { .badge { color: #fcd34d; } }
+  .tip { display: flex; gap: 10px; align-items: flex-start; text-align: left; background: color-mix(in srgb, var(--brand) 8%, transparent);
+    border-radius: 14px; padding: 12px 14px; margin: 14px 0 0; font-size: .82rem; color: var(--muted); }
+  .check { width: 76px; height: 76px; margin: 8px auto 12px; border-radius: 50%; display: grid; place-items: center;
+    background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 14px 30px -10px #16a34a; }
+  .check svg { width: 38px; stroke: #fff; stroke-width: 3.5; fill: none; stroke-dasharray: 40; stroke-dashoffset: 40;
+    animation: draw .5s .2s ease forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .foot { position: relative; z-index: 1; margin-top: 14px; font-size: .72rem; color: var(--muted); text-align: center; }
+  .foot b { color: var(--text); }
+  .wrap { width: 100%; max-width: 400px; }
+  canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 </style>
 </head>
 <body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<canvas id="confetti"></canvas>
+
+<div class="wrap">
 <main class="card">
+  <div class="hero"></div>
+  <div class="avatar" id="avatar"></div>
+  <div class="body">
 
-  <!-- STEP 1: pilih bintang -->
-  <section class="step active" id="s-rate">
-    <img class="logo" id="logo" alt="">
-    <h1 id="shopName">Kedai Anda</h1>
-    <p>Macam mana pengalaman anda hari ini?</p>
-    <div class="stars" id="stars" role="radiogroup" aria-label="Penilaian"></div>
-    <div class="hint" id="hint">Tekan bintang</div>
-  </section>
+    <!-- STEP 1: pilih bintang -->
+    <section class="step active" id="s-rate">
+      <div class="eyebrow" id="shopName">Kedai Anda</div>
+      <h1>Macam mana pengalaman anda hari ini?</h1>
+      <div class="face" id="face">😊</div>
+      <div class="stars" id="stars" role="radiogroup" aria-label="Penilaian"></div>
+      <div class="hint muted" id="hint">Tekan bintang untuk menilai</div>
+    </section>
 
-  <!-- STEP 2a: 1–3 bintang → maklum balas dalaman -->
-  <section class="step" id="s-feedback">
-    <div class="big">🙏</div>
-    <h1>Maaf atas pengalaman anda</h1>
-    <p>Beritahu kami apa yang boleh diperbaiki. Pemilik kedai akan baca sendiri.</p>
-    <div class="chips" id="chips"></div>
-    <textarea id="msg" placeholder="Cerita sedikit…"></textarea>
-    <input id="contact" placeholder="No. telefon (pilihan)">
-    <button class="btn" id="send">Hantar maklum balas</button>
-    <a class="link" id="googleAnyway" target="_blank" rel="noopener">Atau tulis ulasan di Google</a>
-  </section>
+    <!-- STEP 2a: 1–3 bintang → maklum balas dalaman -->
+    <section class="step" id="s-feedback">
+      <div class="face">🙏</div>
+      <h1>Maaf, kami boleh buat lebih baik</h1>
+      <p>Apa yang tak kena? Pemilik kedai akan baca sendiri &amp; tindak segera.</p>
+      <div class="chips" id="chips"></div>
+      <div class="field"><textarea id="msg" placeholder="Ceritakan sedikit pengalaman anda…"></textarea></div>
+      <div class="field"><input id="contact" inputmode="tel" placeholder="No. telefon (pilihan)"></div>
+      <button class="btn" id="send">Hantar maklum balas</button>
+      <a class="link" id="googleAnyway" target="_blank" rel="noopener">Atau tulis ulasan di Google</a>
+    </section>
 
-  <!-- STEP 2b: 4–5 bintang → Google -->
-  <section class="step" id="s-google">
-    <div class="big">🤩</div>
-    <h1>Terima kasih!</h1>
-    <p>Boleh kongsi di Google? Hanya 30 saat & sangat membantu kami.</p>
-    <button class="btn" id="copyGo">Tulis ulasan di Google</button>
-    <p class="foot" id="copyNote" style="display:none">Teks contoh disalin — tampal jika mahu 😊</p>
-  </section>
+    <!-- STEP 2b: 4–5 bintang → Google -->
+    <section class="step" id="s-google">
+      <div class="face">🤩</div>
+      <div class="badge" id="badge">★★★★★</div>
+      <h1>Wah, terima kasih!</h1>
+      <p>Sudi kongsi di Google? Hanya 30 saat dan sangat bermakna untuk kami.</p>
+      <button class="btn google" id="copyGo">
+        <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+        Tulis ulasan di Google
+      </button>
+      <div class="tip"><span>💡</span><span id="tipText">Kami dah salin satu ayat contoh, tampal sahaja jika mahu.</span></div>
+    </section>
 
-  <!-- STEP 3: terima kasih -->
-  <section class="step" id="s-done">
-    <div class="big">✅</div>
-    <h1>Diterima, terima kasih!</h1>
-    <p>Maklum balas anda membantu kami jadi lebih baik.</p>
-  </section>
+    <!-- STEP 3: terima kasih -->
+    <section class="step" id="s-done">
+      <div class="check"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h1>Diterima, terima kasih!</h1>
+      <p>Maklum balas anda akan membantu kami jadi lebih baik. Jumpa lagi! 👋</p>
+    </section>
 
+  </div>
 </main>
+<div class="foot">Dikuasakan oleh <b>BinaReview</b></div>
+</div>
 
 <script>
 /* =========================================================
    KONFIGURASI — tukar bahagian ini sahaja untuk setiap kedai
-   Boleh juga override ikut URL: ?shop=Nama&place=PLACE_ID&wa=60123456789
+   Boleh juga override ikut URL:
+   ?shop=Nama&place=PLACE_ID&wa=60123456789&color=%23e11d48&logo=URL
    ========================================================= */
 const CONFIG = {
   shopName: "Kopi Pak Mat",
-  logo: "",                         // URL logo (kosongkan jika tiada)
+  logo: "",                         // URL logo (kosongkan → huruf pertama nama kedai)
+  brandColor: "#6d28d9",            // warna utama jenama
+  brandColor2: "#db2777",           // warna gradient kedua
   googlePlaceId: "ChIJxxxxxxxxxxxx", // Place ID Google Business
   whatsapp: "60123456789",          // No WhatsApp pemilik (format 60…)
   sheetWebhook: "",                 // URL Google Apps Script (pilihan) — simpan ke Google Sheet
   threshold: 4,                     // >= nilai ini → Google; bawah → dalaman
   showGoogleOnLowRating: true,      // kekal true — lihat README (polisi Google)
-  issues: ["Layanan", "Masa menunggu", "Rasa / kualiti", "Kebersihan", "Harga", "Lain-lain"],
+  issues: ["⏱️ Masa menunggu", "🙋 Layanan", "🍽️ Rasa / kualiti", "🧼 Kebersihan", "💸 Harga", "✏️ Lain-lain"],
   sampleText: ["Servis laju & mesra!", "Sedap, mesti datang lagi.", "Tempat bersih dan selesa."]
 };
 
 // Override dari URL — 1 fail boleh guna untuk banyak kedai
 const q = new URLSearchParams(location.search);
-if (q.get("shop"))  CONFIG.shopName = q.get("shop");
-if (q.get("place")) CONFIG.googlePlaceId = q.get("place");
-if (q.get("wa"))    CONFIG.whatsapp = q.get("wa");
-if (q.get("logo"))  CONFIG.logo = q.get("logo");
-if (q.get("hook"))  CONFIG.sheetWebhook = q.get("hook");
+if (q.get("shop"))   CONFIG.shopName = q.get("shop");
+if (q.get("place"))  CONFIG.googlePlaceId = q.get("place");
+if (q.get("wa"))     CONFIG.whatsapp = q.get("wa");
+if (q.get("logo"))   CONFIG.logo = q.get("logo");
+if (q.get("hook"))   CONFIG.sheetWebhook = q.get("hook");
+if (q.get("color"))  CONFIG.brandColor = q.get("color");
+if (q.get("color2")) CONFIG.brandColor2 = q.get("color2");
 
 const GOOGLE_URL = "https://search.google.com/local/writereview?placeid=" + encodeURIComponent(CONFIG.googlePlaceId);
-const labels = ["", "Teruk", "Kurang memuaskan", "Biasa", "Bagus", "Terbaik!"];
+const labels = ["", "Sangat teruk", "Kurang memuaskan", "Boleh tahan", "Bagus!", "Terbaik! 🔥"];
+const faces  = ["😊", "😞", "😕", "😐", "😄", "😍"];
 const $ = id => document.getElementById(id);
 let rating = 0;
 const picked = new Set();
 
-// Setup
+// Setup jenama
+document.documentElement.style.setProperty("--brand", CONFIG.brandColor);
+document.documentElement.style.setProperty("--brand-2", CONFIG.brandColor2);
 document.title = "Nilai " + CONFIG.shopName;
 $("shopName").textContent = CONFIG.shopName;
-if (CONFIG.logo) $("logo").src = CONFIG.logo; else $("logo").style.display = "none";
+if (CONFIG.logo) {
+  const img = new Image(); img.src = CONFIG.logo; img.alt = CONFIG.shopName; $("avatar").appendChild(img);
+} else {
+  $("avatar").textContent = CONFIG.shopName.trim().charAt(0).toUpperCase();
+}
 $("googleAnyway").href = GOOGLE_URL;
 if (!CONFIG.showGoogleOnLowRating) $("googleAnyway").style.display = "none";
 
+// Bintang
+const STAR = '<svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4L2.8 9.3l6.4-.8z" stroke-linejoin="round"/></svg>';
 const starsEl = $("stars");
 for (let i = 1; i <= 5; i++) {
   const b = document.createElement("button");
-  b.className = "star"; b.textContent = "★"; b.setAttribute("aria-label", i + " bintang");
-  b.onpointerenter = () => paint(i);
-  b.onpointerleave = () => paint(rating);
+  b.className = "star"; b.innerHTML = STAR; b.setAttribute("aria-label", i + " bintang");
+  b.onpointerenter = e => { if (e.pointerType === "mouse") paint(i); };
+  b.onpointerleave = e => { if (e.pointerType === "mouse") paint(rating); };
   b.onclick = () => choose(i);
   starsEl.appendChild(b);
 }
+let lastFace = 0;
 function paint(n) {
   [...starsEl.children].forEach((s, idx) => s.classList.toggle("on", idx < n));
-  $("hint").textContent = n ? labels[n] : "Tekan bintang";
+  $("hint").textContent = n ? labels[n] : "Tekan bintang untuk menilai";
+  $("hint").classList.toggle("muted", !n);
+  if (n !== lastFace) {
+    const f = $("face"); f.textContent = faces[n]; f.classList.remove("pop"); void f.offsetWidth; f.classList.add("pop");
+    lastFace = n;
+  }
 }
 function show(id) {
   document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
   $(id).classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 function choose(n) {
   rating = n; paint(n);
+  [...starsEl.children].forEach((s, idx) => {
+    s.classList.remove("bounce");
+    if (idx < n) setTimeout(() => s.classList.add("bounce"), idx * 60);
+  });
+  if (navigator.vibrate) navigator.vibrate(15);
   log({ type: "rating", rating: n });
-  setTimeout(() => show(n >= CONFIG.threshold ? "s-google" : "s-feedback"), 350);
+  setTimeout(() => {
+    if (n >= CONFIG.threshold) {
+      $("badge").textContent = "★".repeat(n) + "  " + n + ".0";
+      show("s-google"); confetti();
+    } else show("s-feedback");
+  }, 650);
 }
 
 // Chips isu
@@ -168,7 +284,10 @@ CONFIG.issues.forEach(t => {
 // Hantar maklum balas dalaman
 $("send").onclick = () => {
   const msg = $("msg").value.trim(), contact = $("contact").value.trim();
-  if (!msg && !picked.size) { $("msg").focus(); return; }
+  if (!msg && !picked.size) {
+    const b = $("send"); b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake");
+    $("msg").focus(); return;
+  }
   const data = { type: "feedback", rating, issues: [...picked].join(", "), message: msg, contact };
   log(data);
   if (CONFIG.whatsapp && !CONFIG.sheetWebhook) {
@@ -181,9 +300,9 @@ $("send").onclick = () => {
 // 4–5 bintang: salin teks contoh & buka Google
 $("copyGo").onclick = async () => {
   const t = CONFIG.sampleText[Math.floor(Math.random() * CONFIG.sampleText.length)];
-  try { await navigator.clipboard.writeText(t); $("copyNote").style.display = "block"; } catch {}
+  try { await navigator.clipboard.writeText(t); $("tipText").textContent = "Disalin: “" + t + "”, tampal jika mahu 😊"; } catch {}
   log({ type: "google_click", rating });
-  setTimeout(() => location.href = GOOGLE_URL, 600);
+  setTimeout(() => location.href = GOOGLE_URL, 700);
 };
 
 // Hantar ke Google Sheet (jika ada webhook)
@@ -191,6 +310,28 @@ function log(data) {
   if (!CONFIG.sheetWebhook) return;
   const body = JSON.stringify({ ...data, shop: CONFIG.shopName, ua: navigator.userAgent, ts: new Date().toISOString() });
   try { navigator.sendBeacon(CONFIG.sheetWebhook, body); } catch {}
+}
+
+// Confetti ringan (tanpa library)
+function confetti() {
+  const cv = $("confetti"), ctx = cv.getContext("2d");
+  const W = cv.width = innerWidth, H = cv.height = innerHeight;
+  const colors = [CONFIG.brandColor, CONFIG.brandColor2, "#fbbf24", "#34d399", "#60a5fa"];
+  const parts = Array.from({ length: 120 }, () => ({
+    x: W / 2, y: H / 3, r: 4 + Math.random() * 5,
+    vx: (Math.random() - .5) * 14, vy: -Math.random() * 12 - 4,
+    rot: Math.random() * 6, vr: (Math.random() - .5) * .3, c: colors[Math.floor(Math.random() * colors.length)]
+  }));
+  let frame = 0;
+  (function tick() {
+    ctx.clearRect(0, 0, W, H);
+    parts.forEach(p => {
+      p.vy += .35; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.c;
+      ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 1.6); ctx.restore();
+    });
+    if (++frame < 160) requestAnimationFrame(tick); else ctx.clearRect(0, 0, W, H);
+  })();
 }
 </script>
 </body>

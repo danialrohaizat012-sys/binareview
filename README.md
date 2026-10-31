@@ -8,6 +8,8 @@ Cara ia berfungsi: customer tap kad NFC, laman web terbuka, dan dia pilih bintan
 1. **Place ID**: cari kedai di https://developers.google.com/maps/documentation/places/web-service/place-id
 2. Edit `CONFIG` dalam `index.html` ATAU guna satu fail untuk semua kedai melalui URL:
    `https://domain-anda.com/review/?shop=Kopi%20Pak%20Mat&place=ChIJ...&wa=60123456789`
+
+   Parameter tambahan: `logo=URL_LOGO`, `color=%23e11d48` (warna utama), `color2=%23f59e0b` (warna gradient kedua). `%23` ialah `#`.
 3. Host di Netlify / Vercel / GitHub Pages (percuma).
 4. Tulis URL ke dalam tag NFC (NTAG213/215) guna app **NFC Tools**, kemudian Write → Add record → URL. Kunci (lock) tag selepas siap.
 5. Cetak QR code URL yang sama di belakang kad, untuk telefon yang tiada NFC (kebanyakan iPhone lama).
