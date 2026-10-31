@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nilai Kami</title>
+<meta name="theme-color" content="#0f172a">
+<style>
+  :root {
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --accent: #f59e0b;
+    --brand: #0f172a;
+    --ok: #16a34a;
+    --radius: 18px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0b1120; --card:#111827; --text:#f1f5f9; --muted:#94a3b8; --line:#1f2937; --brand:#f1f5f9; }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: 20px 16px; }
+  .card { width: 100%; max-width: 420px; background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 28px 22px; box-shadow: 0 10px 30px rgba(0,0,0,.06); text-align: center; }
+  .logo { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; margin: 0 auto 12px; display: block;
+    background: var(--line); }
+  h1 { font-size: 1.35rem; margin: 0 0 6px; }
+  p { color: var(--muted); margin: 0 0 18px; line-height: 1.5; }
+  .stars { display: flex; justify-content: center; gap: 6px; margin: 8px 0 6px; }
+  .star { background: none; border: 0; padding: 4px; cursor: pointer; font-size: 2.6rem; line-height: 1;
+    color: var(--line); transition: transform .12s, color .12s; }
+  .star.on { color: var(--accent); }
+  .star:active { transform: scale(.88); }
+  .hint { font-size: .85rem; color: var(--muted); min-height: 1.2em; margin-bottom: 4px; }
+  .step { display: none; animation: fade .25s ease; }
+  .step.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  textarea, input { width: 100%; border: 1px solid var(--line); background: var(--bg); color: var(--text);
+    border-radius: 12px; padding: 12px; font: inherit; margin-bottom: 10px; }
+  textarea { min-height: 110px; resize: vertical; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 12px; }
+  .chip { border: 1px solid var(--line); background: var(--bg); color: var(--text); border-radius: 999px;
+    padding: 8px 12px; font-size: .9rem; cursor: pointer; }
+  .chip.on { background: var(--brand); color: var(--card); border-color: var(--brand); }
+  .btn { display: block; width: 100%; border: 0; border-radius: 12px; padding: 14px; font: inherit; font-weight: 600;
+    background: var(--brand); color: var(--card); cursor: pointer; text-decoration: none; margin-top: 4px; }
+  .btn:disabled { opacity: .5; }
+  .link { display: inline-block; margin-top: 14px; color: var(--muted); font-size: .85rem; }
+  .big { font-size: 3rem; margin-bottom: 6px; }
+  .foot { margin-top: 18px; font-size: .75rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<main class="card">
+
+  <!-- STEP 1: pilih bintang -->
+  <section class="step active" id="s-rate">
+    <img class="logo" id="logo" alt="">
+    <h1 id="shopName">Kedai Anda</h1>
+    <p>Macam mana pengalaman anda hari ini?</p>
+    <div class="stars" id="stars" role="radiogroup" aria-label="Penilaian"></div>
+    <div class="hint" id="hint">Tekan bintang</div>
+  </section>
+
+  <!-- STEP 2a: 1–3 bintang → maklum balas dalaman -->
+  <section class="step" id="s-feedback">
+    <div class="big">🙏</div>
+    <h1>Maaf atas pengalaman anda</h1>
+    <p>Beritahu kami apa yang boleh diperbaiki. Pemilik kedai akan baca sendiri.</p>
+    <div class="chips" id="chips"></div>
+    <textarea id="msg" placeholder="Cerita sedikit…"></textarea>
+    <input id="contact" placeholder="No. telefon (pilihan)">
+    <button class="btn" id="send">Hantar maklum balas</button>
+    <a class="link" id="googleAnyway" target="_blank" rel="noopener">Atau tulis ulasan di Google</a>
+  </section>
+
+  <!-- STEP 2b: 4–5 bintang → Google -->
+  <section class="step" id="s-google">
+    <div class="big">🤩</div>
+    <h1>Terima kasih!</h1>
+    <p>Boleh kongsi di Google? Hanya 30 saat & sangat membantu kami.</p>
+    <button class="btn" id="copyGo">Tulis ulasan di Google</button>
+    <p class="foot" id="copyNote" style="display:none">Teks contoh disalin — tampal jika mahu 😊</p>
+  </section>
+
+  <!-- STEP 3: terima kasih -->
+  <section class="step" id="s-done">
+    <div class="big">✅</div>
+    <h1>Diterima, terima kasih!</h1>
+    <p>Maklum balas anda membantu kami jadi lebih baik.</p>
+  </section>
+
+</main>
+
+<script>
+/* =========================================================
+   KONFIGURASI — tukar bahagian ini sahaja untuk setiap kedai
+   Boleh juga override ikut URL: ?shop=Nama&place=PLACE_ID&wa=60123456789
+   ========================================================= */
+const CONFIG = {
+  shopName: "Kopi Pak Mat",
+  logo: "",                         // URL logo (kosongkan jika tiada)
+  googlePlaceId: "ChIJxxxxxxxxxxxx", // Place ID Google Business
+  whatsapp: "60123456789",          // No WhatsApp pemilik (format 60…)
+  sheetWebhook: "",                 // URL Google Apps Script (pilihan) — simpan ke Google Sheet
+  threshold: 4,                     // >= nilai ini → Google; bawah → dalaman
+  showGoogleOnLowRating: true,      // kekal true — lihat README (polisi Google)
+  issues: ["Layanan", "Masa menunggu", "Rasa / kualiti", "Kebersihan", "Harga", "Lain-lain"],
+  sampleText: ["Servis laju & mesra!", "Sedap, mesti datang lagi.", "Tempat bersih dan selesa."]
+};
+
+// Override dari URL — 1 fail boleh guna untuk banyak kedai
+const q = new URLSearchParams(location.search);
+if (q.get("shop"))  CONFIG.shopName = q.get("shop");
+if (q.get("place")) CONFIG.googlePlaceId = q.get("place");
+if (q.get("wa"))    CONFIG.whatsapp = q.get("wa");
+if (q.get("logo"))  CONFIG.logo = q.get("logo");
+if (q.get("hook"))  CONFIG.sheetWebhook = q.get("hook");
+
+const GOOGLE_URL = "https://search.google.com/local/writereview?placeid=" + encodeURIComponent(CONFIG.googlePlaceId);
+const labels = ["", "Teruk", "Kurang memuaskan", "Biasa", "Bagus", "Terbaik!"];
+const $ = id => document.getElementById(id);
+let rating = 0;
+const picked = new Set();
+
+// Setup
+document.title = "Nilai " + CONFIG.shopName;
+$("shopName").textContent = CONFIG.shopName;
+if (CONFIG.logo) $("logo").src = CONFIG.logo; else $("logo").style.display = "none";
+$("googleAnyway").href = GOOGLE_URL;
+if (!CONFIG.showGoogleOnLowRating) $("googleAnyway").style.display = "none";
+
+const starsEl = $("stars");
+for (let i = 1; i <= 5; i++) {
+  const b = document.createElement("button");
+  b.className = "star"; b.textContent = "★"; b.setAttribute("aria-label", i + " bintang");
+  b.onpointerenter = () => paint(i);
+  b.onpointerleave = () => paint(rating);
+  b.onclick = () => choose(i);
+  starsEl.appendChild(b);
+}
+function paint(n) {
+  [...starsEl.children].forEach((s, idx) => s.classList.toggle("on", idx < n));
+  $("hint").textContent = n ? labels[n] : "Tekan bintang";
+}
+function show(id) {
+  document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+}
+function choose(n) {
+  rating = n; paint(n);
+  log({ type: "rating", rating: n });
+  setTimeout(() => show(n >= CONFIG.threshold ? "s-google" : "s-feedback"), 350);
+}
+
+// Chips isu
+CONFIG.issues.forEach(t => {
+  const c = document.createElement("button");
+  c.className = "chip"; c.textContent = t;
+  c.onclick = () => { picked.has(t) ? picked.delete(t) : picked.add(t); c.classList.toggle("on"); };
+  $("chips").appendChild(c);
+});
+
+// Hantar maklum balas dalaman
+$("send").onclick = () => {
+  const msg = $("msg").value.trim(), contact = $("contact").value.trim();
+  if (!msg && !picked.size) { $("msg").focus(); return; }
+  const data = { type: "feedback", rating, issues: [...picked].join(", "), message: msg, contact };
+  log(data);
+  if (CONFIG.whatsapp && !CONFIG.sheetWebhook) {
+    const text = `⭐ Maklum balas ${CONFIG.shopName} (${rating}/5)\nIsu: ${data.issues || "-"}\n${msg}\nHubungi: ${contact || "-"}`;
+    window.open("https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(text), "_blank");
+  }
+  show("s-done");
+};
+
+// 4–5 bintang: salin teks contoh & buka Google
+$("copyGo").onclick = async () => {
+  const t = CONFIG.sampleText[Math.floor(Math.random() * CONFIG.sampleText.length)];
+  try { await navigator.clipboard.writeText(t); $("copyNote").style.display = "block"; } catch {}
+  log({ type: "google_click", rating });
+  setTimeout(() => location.href = GOOGLE_URL, 600);
+};
+
+// Hantar ke Google Sheet (jika ada webhook)
+function log(data) {
+  if (!CONFIG.sheetWebhook) return;
+  const body = JSON.stringify({ ...data, shop: CONFIG.shopName, ua: navigator.userAgent, ts: new Date().toISOString() });
+  try { navigator.sendBeacon(CONFIG.sheetWebhook, body); } catch {}
+}
+</script>
+</body>
+</html>
